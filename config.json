@@ -11,7 +11,8 @@
   },
   "databases": {
     "mongodb": {
-      "uri": "mongodb://cloud.sakib.ninja:27717"
+      "uri": "mongodb://cloud.sakib.ninja:27717",
+      "dbname": "riesling-cms"
     }
   },
   "others": {

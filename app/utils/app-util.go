@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"io/ioutil"
+	"github.com/nu7hatch/gouuid"
 )
 
 func GetAppPID() int {
@@ -28,4 +29,12 @@ func PutAppPID() {
 	}
 	pidFile.WriteString(strconv.Itoa(pid))
 	pidFile.Close()
+}
+
+func GetUUID() string {
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return ""
+	}
+	return uid.String()
 }
