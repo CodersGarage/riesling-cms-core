@@ -19,6 +19,7 @@ type User struct {
 	Email    string    `json:"email"`
 	Password string    `json:"password,omitempty"`
 	Level    int       `json:"level"`
+	IsBanned bool      `json:"-"`
 }
 
 func (u *User) Save() bool {
@@ -26,6 +27,20 @@ func (u *User) Save() bool {
 		return true
 	}
 	return false
+}
+
+func (u *User) Update(hash string) (bool, *User) {
+	preUser := User{}
+	if preUser.Get(hash) {
+		if len(u.Name) >= 3 && len(u.Name) <= 30 {
+			preUser.Name = u.Name
+		}
+		if len(u.Password) >= 8 && len(u.Password) <= 30 {
+			preUser.Password = u.Password
+		}
+		return preUser.Save(), &preUser
+	}
+	return false, u
 }
 
 func (u *User) Delete() {

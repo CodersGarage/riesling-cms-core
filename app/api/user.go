@@ -30,7 +30,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			user.Level = data.USER_LEVEL_MEMBER
 		}
-		if len(user.Password) >= 8 && len(user.Password) <= 20 {
+		if len(user.Password) >= 8 && len(user.Password) <= 30 {
 			if !user.IsEmailExists() {
 				user.Hash = utils.GetUUID()
 				if user.Hash != "" && user.Save() {
@@ -58,7 +58,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			Error: bson.M{
 				"password": []string{
 					"The password field is required.",
-					"The password field must be between 8-20 char.",
+					"The password field must be between 8-30 char.",
 				},
 			},
 		})
@@ -101,6 +101,31 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user := data.User{}
-	json.NewDecoder(r.Body).Decode(user)
-
+	json.NewDecoder(r.Body).Decode(&user)
+	params := mux.Vars(r)
+	if len(params) > 0 {
+		hash := params["hash"]
+		isUpdateOk, u := user.Update(hash)
+		if isUpdateOk {
+			u.Password = ""
+			apiResp := APIResponse{
+				Code:    http.StatusOK,
+				Message: "User has been updated.",
+				Data:    u,
+			}
+			json.NewEncoder(w).Encode(apiResp)
+			return
+		}
+		apiResp := APIResponse{
+			Code:    http.StatusInternalServerError,
+			Message: "Couldn't update user.",
+		}
+		json.NewEncoder(w).Encode(apiResp)
+		return
+	}
+	apiResp := APIResponse{
+		Code:    http.StatusBadRequest,
+		Message: "User hash required.",
+	}
+	json.NewEncoder(w).Encode(apiResp)
 }
