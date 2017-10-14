@@ -5,7 +5,7 @@ import (
 	"github.com/s4kibs4mi/govalidator"
 	"encoding/json"
 	"riesling-cms-core/app/data"
-	"github.com/s4kibs4mi/rest-in-go/utils"
+	"riesling-cms-core/app/utils"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -29,18 +29,25 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			user.Level = data.USER_LEVEL_MEMBER
 		}
-		user.Hash = utils.GetUUI()
-		if user.Hash != "" && user.Save() {
+		if !user.IsEmailExists() {
+			user.Hash = utils.GetUUID()
+			if user.Hash != "" && user.Save() {
+				json.NewEncoder(w).Encode(APIResponse{
+					Code:    http.StatusOK,
+					Message: "User has been created.",
+					Data:    user,
+				})
+				return
+			}
 			json.NewEncoder(w).Encode(APIResponse{
-				Code:    http.StatusOK,
-				Message: "User has been created.",
-				Data:    user,
+				Code:    http.StatusInternalServerError,
+				Message: "Something went wrong.",
 			})
 			return
 		}
 		json.NewEncoder(w).Encode(APIResponse{
-			Code:    http.StatusInternalServerError,
-			Message: "Something went wrong.",
+			Code:    http.StatusConflict,
+			Message: "Email address exists.",
 		})
 		return
 	}

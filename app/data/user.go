@@ -3,6 +3,7 @@ package data
 import (
 	"riesling-cms-core/app/conn"
 	"github.com/go-bongo/bongo"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -41,6 +42,16 @@ func (u *User) LevelDown() {
 
 func (u *User) Ban() {
 
+}
+
+func (u *User) IsEmailExists() bool {
+	results := conn.GetConnection().Collection(COLLECTION_NAME).Find(bson.M{
+		"email": u.Email,
+	})
+	if results.Next(u) {
+		return true
+	}
+	return false
 }
 
 func (u *User) Count() int {
