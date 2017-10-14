@@ -17,7 +17,7 @@ type User struct {
 	Hash     string    `json:"hash"`
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
-	Password string    `json:"password"`
+	Password string    `json:"password,omitempty"`
 	Level    int       `json:"level"`
 }
 
@@ -60,4 +60,11 @@ func (u *User) Count() int {
 		return 0
 	}
 	return count
+}
+
+func (u *User) Get(hash string) bool {
+	results := conn.GetConnection().Collection(COLLECTION_NAME).Find(bson.M{
+		"hash": hash,
+	})
+	return results.Next(u)
 }
