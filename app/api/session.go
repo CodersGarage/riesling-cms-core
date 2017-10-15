@@ -125,5 +125,28 @@ func DeleteAllSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReCreateSession(w http.ResponseWriter, r *http.Request) {
-
+	refreshToken := r.Header.Get(REFRESH_TOKEN)
+	session := data.Session{}
+	if refreshToken != "" && session.GetByRefreshToken(refreshToken) {
+		session.Delete()
+		session = data.Session{
+			AccessToken:  utils.GetUUID(),
+			RefreshToken: utils.GetUUID(),
+			ExpireTime:   utils.GetExpireTime(),
+			Hash:         session.Hash,
+		}
+		if session.Save() {
+			resp := APIResponse{
+				Code: http.StatusOK,
+				Data: session,
+			}
+			ServeAsJSON(resp, w)
+			return
+		}
+	}
+	resp := APIResponse{
+		Code:    http.StatusInternalServerError,
+		Message: "Something went wrong.",
+	}
+	ServeAsJSON(resp, w)
 }

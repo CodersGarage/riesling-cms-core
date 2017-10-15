@@ -37,6 +37,16 @@ func (s *Session) Get(AccessToken string) bool {
 	return false
 }
 
+func (s *Session) GetByRefreshToken(RefreshToken string) bool {
+	resultSet := conn.GetConnection().Collection(SESSION_COLLECTION_NAME).Find(bson.M{
+		"refreshtoken": RefreshToken,
+	})
+	if resultSet.Next(s) {
+		return true
+	}
+	return false
+}
+
 func (s *Session) Delete() bool {
 	err := conn.GetConnection().Collection(SESSION_COLLECTION_NAME).DeleteDocument(s)
 	return err == nil
