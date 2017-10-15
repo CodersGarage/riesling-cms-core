@@ -34,26 +34,29 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			if !user.IsEmailExists() {
 				user.Hash = utils.GetUUID()
 				if user.Hash != "" && user.Save() {
-					json.NewEncoder(w).Encode(APIResponse{
+					resp := APIResponse{
 						Code:    http.StatusOK,
 						Message: "User has been created.",
 						Data:    user,
-					})
+					}
+					ServeAsJSON(resp, w)
 					return
 				}
-				json.NewEncoder(w).Encode(APIResponse{
+				resp := APIResponse{
 					Code:    http.StatusInternalServerError,
 					Message: "Something went wrong.",
-				})
+				}
+				ServeAsJSON(resp, w)
 				return
 			}
-			json.NewEncoder(w).Encode(APIResponse{
+			resp := APIResponse{
 				Code:    http.StatusConflict,
 				Message: "Email address exists.",
-			})
+			}
+			ServeAsJSON(resp, w)
 			return
 		}
-		json.NewEncoder(w).Encode(APIResponse{
+		resp := APIResponse{
 			Code: http.StatusBadRequest,
 			Error: bson.M{
 				"password": []string{
@@ -61,14 +64,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 					"The password field must be between 8-30 char.",
 				},
 			},
-		})
+		}
+		ServeAsJSON(resp, w)
 		return
 	}
-	apiResp := APIResponse{
+	resp := APIResponse{
 		Code:  http.StatusBadRequest,
 		Error: err,
 	}
-	json.NewEncoder(w).Encode(apiResp)
+	ServeAsJSON(resp, w)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -78,25 +82,25 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		user := data.User{}
 		if user.Get(hash) {
 			user.Password = ""
-			apiResp := APIResponse{
+			resp := APIResponse{
 				Code: http.StatusOK,
 				Data: user,
 			}
-			json.NewEncoder(w).Encode(apiResp)
+			ServeAsJSON(resp, w)
 			return
 		}
-		apiResp := APIResponse{
+		resp := APIResponse{
 			Code:    http.StatusNotFound,
 			Message: "User not found.",
 		}
-		json.NewEncoder(w).Encode(apiResp)
+		ServeAsJSON(resp, w)
 		return
 	}
-	apiResp := APIResponse{
+	resp := APIResponse{
 		Code:    http.StatusBadRequest,
 		Message: "User hash required.",
 	}
-	json.NewEncoder(w).Encode(apiResp)
+	ServeAsJSON(resp, w)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -108,24 +112,24 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		isUpdateOk, u := user.Update(hash)
 		if isUpdateOk {
 			u.Password = ""
-			apiResp := APIResponse{
+			resp := APIResponse{
 				Code:    http.StatusOK,
 				Message: "User has been updated.",
 				Data:    u,
 			}
-			json.NewEncoder(w).Encode(apiResp)
+			ServeAsJSON(resp, w)
 			return
 		}
-		apiResp := APIResponse{
+		resp := APIResponse{
 			Code:    http.StatusInternalServerError,
 			Message: "Couldn't update user.",
 		}
-		json.NewEncoder(w).Encode(apiResp)
+		ServeAsJSON(resp, w)
 		return
 	}
-	apiResp := APIResponse{
+	resp := APIResponse{
 		Code:    http.StatusBadRequest,
 		Message: "User hash required.",
 	}
-	json.NewEncoder(w).Encode(apiResp)
+	ServeAsJSON(resp, w)
 }

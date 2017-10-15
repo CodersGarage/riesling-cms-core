@@ -17,6 +17,11 @@ func InitRoutes() {
 	v1.HandleFunc("/user/list/{hash}", api.GetUser).Methods("GET")
 	v1.HandleFunc("/user/update/{hash}", api.SelfAuth(api.UpdateUser)).Methods("PUT")
 
+	v1.HandleFunc("/auth", api.CreateSession).Methods("POST")   // Create Session
+	v1.HandleFunc("/auth", api.CheckSession).Methods("GET")     // Verify Session
+	v1.HandleFunc("/auth", api.DeleteSession).Methods("DELETE") // Delete Session
+	v1.HandleFunc("/auth", api.ReCreateSession).Methods("PUT")  // Refresh Session
+
 	go http.ListenAndServe(viper.GetString("app.uri"), RootRoute)
 	WaitGroup.Add(1)
 }

@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"io/ioutil"
 	"github.com/nu7hatch/gouuid"
+	"time"
+	"riesling-cms-core/app/data"
 )
 
 func GetAppPID() int {
@@ -37,4 +39,8 @@ func GetUUID() string {
 		return ""
 	}
 	return uid.String()
+}
+
+func GetExpireTime() time.Time {
+	return time.Now().Add(data.SESSION_VALIDITY_TIME)
 }
