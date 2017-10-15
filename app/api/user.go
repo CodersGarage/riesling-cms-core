@@ -78,7 +78,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	pathParams := mux.Vars(r)
 	if len(pathParams) > 0 {
-		hash := pathParams["hash"]
+		hash := pathParams[HASH]
 		user := data.User{}
 		if user.Get(hash) {
 			user.Password = ""

@@ -12,6 +12,8 @@ type APIResponse struct {
 	Error   interface{} `json:"error,omitempty"`
 }
 
+type ResponseValue map[string]interface{}
+
 func ServeAsJSON(resp APIResponse, w http.ResponseWriter) {
 	json.NewEncoder(w).Encode(resp)
 }

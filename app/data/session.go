@@ -29,7 +29,7 @@ func (s *Session) Save() bool {
 
 func (s *Session) Get(AccessToken string) bool {
 	resultSet := conn.GetConnection().Collection(SESSION_COLLECTION_NAME).Find(bson.M{
-		"access_token": AccessToken,
+		"accesstoken": AccessToken,
 	})
 	if resultSet.Next(s) {
 		return true

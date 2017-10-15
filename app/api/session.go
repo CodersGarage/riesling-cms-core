@@ -6,6 +6,7 @@ import (
 	"github.com/s4kibs4mi/govalidator"
 	"riesling-cms-core/app/utils"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 func CreateSession(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +72,64 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckSession(w http.ResponseWriter, r *http.Request) {
-
+	accessToken := r.Header.Get(ACCESS_TOKEN)
+	hash := r.Header.Get("hash")
+	if accessToken != "" && hash != "" {
+		session := data.Session{}
+		if session.Get(accessToken) {
+			user := data.User{}
+			if user.Get(hash) {
+				if session.Hash == user.Hash {
+					if session.ExpireTime.After(time.Now()) {
+						resp := APIResponse{
+							Code: http.StatusOK,
+							Data: ResponseValue{
+								"is_valid": true,
+								"level":    user.Level,
+							},
+						}
+						ServeAsJSON(resp, w)
+						return
+					}
+					resp := APIResponse{
+						Code: http.StatusNotAcceptable,
+						Error: ResponseValue{
+							"access_token": []string{
+								"Access token expired.",
+							},
+						},
+					}
+					ServeAsJSON(resp, w)
+					return
+				}
+				resp := APIResponse{
+					Code: http.StatusNotFound,
+					Error: ResponseValue{
+						"access_token": []string{
+							"Access token invalid.",
+						},
+						"hash": []string{
+							"Hash invalid.",
+						},
+					},
+				}
+				ServeAsJSON(resp, w)
+				return
+			}
+		}
+	}
+	resp := APIResponse{
+		Code: http.StatusBadRequest,
+		Error: ResponseValue{
+			"access_token": []string{
+				"Access token required.",
+			},
+			"hash": []string{
+				"Hash required.",
+			},
+		},
+	}
+	ServeAsJSON(resp, w)
 }
 
 func DeleteSession(w http.ResponseWriter, r *http.Request) {

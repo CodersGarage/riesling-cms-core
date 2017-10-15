@@ -13,14 +13,14 @@ var WaitGroup = sync.WaitGroup{}
 
 func InitRoutes() {
 	v1 := RootRoute.PathPrefix("/api/v1").Subrouter()
-	v1.HandleFunc("/user/create", api.CreateUser).Methods("POST")
-	v1.HandleFunc("/user/list/{hash}", api.GetUser).Methods("GET")
-	v1.HandleFunc("/user/update/{hash}", api.SelfAuth(api.UpdateUser)).Methods("PUT")
+	v1.HandleFunc("/user/create", api.CreateUser).Methods("POST")                                  // Create Profile
+	v1.HandleFunc("/user/list/{hash}", api.SelfAuthWithPathParam(api.GetUser)).Methods("GET")      // Get Self Profile
+	v1.HandleFunc("/user/update/{hash}", api.SelfAuthWithPathParam(api.UpdateUser)).Methods("PUT") // Update Self Profile
 
-	v1.HandleFunc("/auth", api.CreateSession).Methods("POST")   // Create Session
-	v1.HandleFunc("/auth", api.CheckSession).Methods("GET")     // Verify Session
-	v1.HandleFunc("/auth", api.DeleteSession).Methods("DELETE") // Delete Session
-	v1.HandleFunc("/auth", api.ReCreateSession).Methods("PUT")  // Refresh Session
+	v1.HandleFunc("/auth", api.CreateSession).Methods("POST")                 // Create Session
+	v1.HandleFunc("/auth", api.SelfAuth(api.CheckSession)).Methods("GET")     // Verify Session
+	v1.HandleFunc("/auth", api.SelfAuth(api.DeleteSession)).Methods("DELETE") // Delete Session
+	v1.HandleFunc("/auth", api.ReCreateSession).Methods("PUT")                // Refresh Session
 
 	go http.ListenAndServe(viper.GetString("app.uri"), RootRoute)
 	WaitGroup.Add(1)
