@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	USER_LEVEL_ADMIN  = 1
-	USER_LEVEL_MEMBER = 2
-	COLLECTION_NAME   = "users"
+	USER_LEVEL_ADMIN     = 1
+	USER_LEVEL_MEMBER    = 2
+	USER_COLLECTION_NAME = "users"
 )
 
 type User struct {
@@ -23,7 +23,7 @@ type User struct {
 }
 
 func (u *User) Save() bool {
-	if err := conn.GetConnection().Collection(COLLECTION_NAME).Save(u); err == nil {
+	if err := conn.GetConnection().Collection(USER_COLLECTION_NAME).Save(u); err == nil {
 		return true
 	}
 	return false
@@ -60,7 +60,7 @@ func (u *User) Ban() {
 }
 
 func (u *User) IsEmailExists() bool {
-	results := conn.GetConnection().Collection(COLLECTION_NAME).Find(bson.M{
+	results := conn.GetConnection().Collection(USER_COLLECTION_NAME).Find(bson.M{
 		"email": u.Email,
 	})
 	if results.Next(u) {
@@ -70,7 +70,7 @@ func (u *User) IsEmailExists() bool {
 }
 
 func (u *User) Count() int {
-	count, err := conn.GetConnection().Collection(COLLECTION_NAME).Collection().Count()
+	count, err := conn.GetConnection().Collection(USER_COLLECTION_NAME).Collection().Count()
 	if err != nil {
 		return 0
 	}
@@ -78,7 +78,7 @@ func (u *User) Count() int {
 }
 
 func (u *User) Get(hash string) bool {
-	results := conn.GetConnection().Collection(COLLECTION_NAME).Find(bson.M{
+	results := conn.GetConnection().Collection(USER_COLLECTION_NAME).Find(bson.M{
 		"hash": hash,
 	})
 	return results.Next(u)
