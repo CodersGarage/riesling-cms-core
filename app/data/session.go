@@ -17,7 +17,7 @@ type Session struct {
 	AccessToken  string    `json:"access_token"`
 	RefreshToken string    `json:"refresh_token"`
 	ExpireTime   time.Time `json:"expire_time"`
-	Hash         string    `json:"-"`
+	Hash         string    `json:"hash"`
 }
 
 func (s *Session) Save() bool {
@@ -40,4 +40,11 @@ func (s *Session) Get(AccessToken string) bool {
 func (s *Session) Delete() bool {
 	err := conn.GetConnection().Collection(SESSION_COLLECTION_NAME).DeleteDocument(s)
 	return err == nil
+}
+
+func (s *Session) DeleteAll() bool {
+	changeInfo, err := conn.GetConnection().Collection(SESSION_COLLECTION_NAME).Delete(bson.M{
+		"hash": s.Hash,
+	})
+	return err == nil && changeInfo.Removed > 0
 }

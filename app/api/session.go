@@ -85,7 +85,43 @@ func CheckSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteSession(w http.ResponseWriter, r *http.Request) {
+	accessToken := r.Header.Get(ACCESS_TOKEN)
+	session := data.Session{}
+	if session.Get(accessToken) && session.Delete() {
+		resp := APIResponse{
+			Code: http.StatusOK,
+			Data: ResponseValue{
+				"success": true,
+			},
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	resp := APIResponse{
+		Code:    http.StatusInternalServerError,
+		Message: "Something went wrong.",
+	}
+	ServeAsJSON(resp, w)
+}
 
+func DeleteAllSession(w http.ResponseWriter, r *http.Request) {
+	accessToken := r.Header.Get(ACCESS_TOKEN)
+	session := data.Session{}
+	if session.Get(accessToken) && session.DeleteAll() {
+		resp := APIResponse{
+			Code: http.StatusOK,
+			Data: ResponseValue{
+				"success": true,
+			},
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	resp := APIResponse{
+		Code:    http.StatusInternalServerError,
+		Message: "Something went wrong.",
+	}
+	ServeAsJSON(resp, w)
 }
 
 func ReCreateSession(w http.ResponseWriter, r *http.Request) {
