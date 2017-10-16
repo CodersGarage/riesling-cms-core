@@ -29,7 +29,7 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 						AccessToken:  utils.GetUUID(),
 						RefreshToken: utils.GetUUID(),
 						ExpireTime:   utils.GetExpireTime(),
-						Hash:         user.Hash,
+						Hash:         preUser.Hash,
 					}
 					if session.Save() {
 						resp := APIResponse{
