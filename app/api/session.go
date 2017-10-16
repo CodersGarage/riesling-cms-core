@@ -26,8 +26,8 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 			if preUser.GetByEmail(user.Email) {
 				if utils.CompareHashedPassword(preUser.Password, user.Password) {
 					session := data.Session{
-						AccessToken:  utils.GetUUID(),
-						RefreshToken: utils.GetUUID(),
+						AccessToken:  utils.GetSHA256Hashed(utils.GetUUID()),
+						RefreshToken: utils.GetSHA256Hashed(utils.GetUUID()),
 						ExpireTime:   utils.GetExpireTime(),
 						Hash:         preUser.Hash,
 					}
