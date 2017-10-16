@@ -9,6 +9,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 	"time"
 	"riesling-cms-core/app/data"
+	"strings"
 )
 
 func GetAppPID() int {
@@ -38,7 +39,7 @@ func GetUUID() string {
 	if err != nil {
 		return ""
 	}
-	return uid.String()
+	return strings.Replace(uid.String(), "-", "", -1)
 }
 
 func GetExpireTime() time.Time {

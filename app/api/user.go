@@ -31,9 +31,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			user.Level = data.USER_LEVEL_MEMBER
 		}
 		if len(user.Password) >= 8 && len(user.Password) <= 30 {
+			user.Password = utils.HashPassword(user.Password)
 			if !user.IsEmailExists() {
 				user.Hash = utils.GetUUID()
 				if user.Hash != "" && user.Save() {
+					user.Password = ""
 					resp := APIResponse{
 						Code:    http.StatusOK,
 						Message: "User has been created.",

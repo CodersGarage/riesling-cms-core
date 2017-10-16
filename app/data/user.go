@@ -84,10 +84,9 @@ func (u *User) Get(hash string) bool {
 	return results.Next(u)
 }
 
-func (u *User) GetByEmailAndPassword(email string, password string) bool {
+func (u *User) GetByEmail(email string) bool {
 	results := conn.GetConnection().Collection(USER_COLLECTION_NAME).Find(bson.M{
-		"email":    email,
-		"password": password,
+		"email": email,
 	})
 	return results.Next(u)
 }

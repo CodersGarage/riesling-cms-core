@@ -22,31 +22,40 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 	err := vr.ValidateJSON()
 	if len(err) == 0 {
 		if len(user.Password) >= 8 && len(user.Password) <= 30 {
-			if user.GetByEmailAndPassword(user.Email, user.Password) {
-				session := data.Session{
-					AccessToken:  utils.GetUUID(),
-					RefreshToken: utils.GetUUID(),
-					ExpireTime:   utils.GetExpireTime(),
-					Hash:         user.Hash,
-				}
-				if session.Save() {
+			preUser := data.User{}
+			if preUser.GetByEmail(user.Email) {
+				if utils.CompareHashedPassword(preUser.Password, user.Password) {
+					session := data.Session{
+						AccessToken:  utils.GetUUID(),
+						RefreshToken: utils.GetUUID(),
+						ExpireTime:   utils.GetExpireTime(),
+						Hash:         user.Hash,
+					}
+					if session.Save() {
+						resp := APIResponse{
+							Code: http.StatusOK,
+							Data: session,
+						}
+						ServeAsJSON(resp, w)
+						return
+					}
 					resp := APIResponse{
-						Code: http.StatusOK,
-						Data: session,
+						Code:    http.StatusInternalServerError,
+						Message: "Something went wrong.",
 					}
 					ServeAsJSON(resp, w)
 					return
 				}
 				resp := APIResponse{
 					Code:    http.StatusInternalServerError,
-					Message: "Something went wrong.",
+					Message: "Email & Password mismatch.",
 				}
 				ServeAsJSON(resp, w)
 				return
 			}
 			resp := APIResponse{
 				Code:    http.StatusNotAcceptable,
-				Message: "Email & Password mismatch.",
+				Message: "User not found",
 			}
 			ServeAsJSON(resp, w)
 			return
